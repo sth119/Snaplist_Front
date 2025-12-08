@@ -38,58 +38,7 @@
 
 /* ====================== Create ====================== */
 
-/* .CreateBox {
-  /* border-style: solid;
-  border-width: 1px;
-  border-color: red; 
-      
-  @apply
-     flex
-     flex-row
-     mt-32
-     h-14
-     bg-gray-100
-     mx-4
-     rounded-lg
-     hover:bg-gray-200
-}
 
-.CreateBtn {
-          /* border-style: solid;
-        border-width: 1px;
-        border-color: red; 
-
-  @apply
-    flex
-    flex-1
-    justify-center
-    items-center
-    bg-white
-    rounded-lg
-    text-3xl
-    font-bold
-
-    
-}
-
-.CreateTextBox {
-          /* border-style: solid;
-        border-width: 1px;
-        border-color: red; 
-
-  @apply
-    flex
-    flex-1
-    justify-center
-    items-center
-    bg-white
-    rounded-lg
-    text-lg
-    font-medium
-
-    
-} 
-*/
 
 .CreateBox {
   /* border-style: solid;

@@ -2,11 +2,12 @@
 
     @apply
         flex 
-        flex-col /* flex 방향을 새로로 */
-        items-center /* 가로 정렬 */ 
-        px-4   /* 좌우 여백 */
-        flex-grow
-        /* mt-10   margin top : 1 당 4px */
+        flex-col 
+        items-center 
+        justify-center
+        px-4   
+        flex-1
+        min-h-full
 
 }
 
@@ -23,9 +24,7 @@
 }
 
 .BtnBox {
-    /* border-style: solid;
-    border-width: 1px;
-    border-color: red; */
+
 
     @apply
         flex 
@@ -35,9 +34,7 @@
 }
 
 .MoveRegister {
-        /* border-style: solid;
-        border-width: 1px;
-        border-color: red; */
+
 
     @apply
         px-6
@@ -49,9 +46,7 @@
 }
 
 .MoveLogin {
-        /* border-style: solid;
-        border-width: 1px;
-        border-color: red; */
+
 
     @apply
         px-6

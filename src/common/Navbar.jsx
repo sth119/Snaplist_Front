@@ -45,7 +45,9 @@ const Navbar = () => {
       </div>
       <div className='LoginSettingBox'>
         <div className='Setting' />
+        <Link to='/login'>
         <div className='GoLoginPage' />
+        </Link>
       </div>
     </div>
   )
