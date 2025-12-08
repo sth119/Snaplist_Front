@@ -1,0 +1,63 @@
+.MainSection {
+
+    @apply
+        flex 
+        flex-col /* flex 방향을 새로로 */
+        items-center /* 가로 정렬 */ 
+        px-4   /* 좌우 여백 */
+        flex-grow
+        /* mt-10   margin top : 1 당 4px */
+
+}
+
+.MainBoard {
+
+        
+    @apply
+        text-center
+        text-8xl
+        font-light
+        leading-snug
+        mt-8
+        mb-8
+}
+
+.BtnBox {
+    /* border-style: solid;
+    border-width: 1px;
+    border-color: red; */
+
+    @apply
+        flex 
+        gap-32
+        
+        mt-10
+}
+
+.MoveRegister {
+        /* border-style: solid;
+        border-width: 1px;
+        border-color: red; */
+
+    @apply
+        px-6
+        py-3
+        bg-gray-300
+        text-gray-700
+        rounded-md
+        cursor-pointer
+}
+
+.MoveLogin {
+        /* border-style: solid;
+        border-width: 1px;
+        border-color: red; */
+
+    @apply
+        px-6
+        py-3
+        bg-gray-300
+        text-gray-700
+        rounded-md
+        cursor-pointer
+}

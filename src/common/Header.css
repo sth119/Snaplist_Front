@@ -1,0 +1,9 @@
+.header {
+    @apply
+        bg-gray-500 
+        text-white 
+        p-4 
+        text-xl 
+        font-bold
+  
+}

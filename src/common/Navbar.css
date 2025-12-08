@@ -1,0 +1,474 @@
+.Navbar {
+          /* border-style: solid;
+        border-width: 1px;
+        border-color: red; */
+
+  /* @apply
+    flex-grow
+    inset-0
+    w-[20vw]
+    bg-gray-400 */
+
+      /* @apply
+    flex-grow
+    flex-shrink-0
+    w-48
+    max-w-64
+    bg-gray-300 */
+
+    @apply
+    flex
+    flex-grow
+    flex-col
+    flex-shrink-0
+    justify-start
+    w-48
+    max-w-48
+    bg-gray-300
+    py-8
+}
+
+
+.OptionBox {
+  @apply
+  space-y-2
+  px-2
+}
+
+
+/* ====================== Create ====================== */
+
+/* .CreateBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; 
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-gray-100
+     mx-4
+     rounded-lg
+     hover:bg-gray-200
+}
+
+.CreateBtn {
+          /* border-style: solid;
+        border-width: 1px;
+        border-color: red; 
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    text-3xl
+    font-bold
+
+    
+}
+
+.CreateTextBox {
+          /* border-style: solid;
+        border-width: 1px;
+        border-color: red; 
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    text-lg
+    font-medium
+
+    
+} 
+*/
+
+.CreateBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.CreateBox:hover {
+  @apply bg-gray-200;
+}
+
+
+.CreateBtn,
+.CreateTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.CreateBtn {
+  @apply
+    text-3xl
+    font-bold
+}
+
+.CreateTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.CreateBox:hover .CreateBtn,
+.CreateBox:hover .CreateTextBox {
+  @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
+}
+
+/* ====================== Home ====================== */
+
+.HomeBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.HomeBox:hover {
+  @apply bg-gray-200;
+}
+
+
+.HomeIcon,
+.HomeTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.HomeIcon {
+  background-image: url('../assets/home.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
+
+.HomeTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.HomeBox:hover .HomeIcon,
+.HomeBox:hover .HomeTextBox {
+  @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
+}
+
+
+/* ====================== Photo ====================== */
+
+.PhotoBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.PhotoBox:hover {
+  @apply bg-gray-200;
+}
+
+
+.PhotoIcon,
+.PhotoTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.PhotoIcon {
+  background-image: url('../assets/photo.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
+
+.PhotoTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.PhotoBox:hover .PhotoIcon,
+.PhotoBox:hover .PhotoTextBox {
+  @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
+}
+
+
+/* ====================== Video ====================== */
+
+.VideoBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.VideoBox:hover {
+  @apply bg-gray-200;
+}
+
+
+.VideoIcon,
+.VideoTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.VideoIcon {
+  background-image: url('../assets/video.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
+
+.VideoTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.VideoBox:hover .VideoIcon,
+.VideoBox:hover .VideoTextBox {
+  @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
+}
+
+
+/* ====================== Trash ====================== */
+
+.TrashBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     mt-32
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.TrashBox:hover {
+  @apply bg-gray-200;
+}
+
+
+.TrashIcon,
+.TrashTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.TrashIcon {
+  background-image: url('../assets/trash.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
+
+.TrashTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.TrashBox:hover .TrashIcon,
+.TrashBox:hover .TrashTextBox {
+  @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
+}
+
+
+/* =========== Login Icon =========== */
+
+
+.LoginSettingBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     /* mt-32 */
+     mt-auto
+      px-4  /* 위치맞추기중 수정 */
+     h-14
+     bg-gray-300
+     mx-4
+     rounded-lg
+     gap-4
+     
+     
+     
+}
+
+.GoLoginPage,
+.Setting {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-gray-300
+    /* rounded-lg */
+    transition-colors duration-200
+    hover:bg-gray-400
+    rounded-full
+    shadow-lg
+    w-11
+    h-11
+
+    
+}
+
+
+
+.GoLoginPage {
+  background-image: url('../assets/logout.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
+
+.Setting {
+  background-image: url('../assets/setting.png');
+  @apply
+    bg-no-repeat
+    bg-center
+    bg-contain
+    mt-2
+    mb-2
+}
