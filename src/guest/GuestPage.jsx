@@ -1,13 +1,25 @@
-import React from 'react'
+import { useFile } from '../common/Context';
 
 const GuestPage = () => {
+  const { files } = useFile();
+
   return (
-   <div style={{ padding: '50px', fontSize: '30px', background: '#f0f0f0' }}>
-      🎉 게스트 페이지에 오신 걸 환영합니다! 🎉
-      <br />
-      여기가 GuestPage예요!
+    <div className="file-grid">
+      {files.length === 0 ? (
+        <p style={{textAlign: 'center', color: '#999', marginTop: '50px'}}>
+          아직 링크가 없어요.<br/>좌측 + 생성 버튼을 눌러 추가해보세요!
+        </p>
+      ) : (
+        files.map(file => (
+          <div key={file.id} className="file-item">
+            <div className="icon">Link</div>
+            <p>{file.title}</p>
+            <small style={{wordBreak: 'break-all'}}>{file.url}</small>
+          </div>
+        ))
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default GuestPage;

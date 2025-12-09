@@ -1,12 +1,17 @@
 import React from 'react'
 import "./Navbar.css"
 import { Link } from 'react-router-dom'
+import { useFile } from './Context'
 
 const Navbar = () => {
+  const { openModal } = useFile();
+
+
+
   return (
     <div className='Navbar'>
       <div className='OptionBox'>
-        <div className='CreateBox'>
+        <div className='CreateBox' onClick={openModal}>
           <div className='CreateBtn'>
             +
           </div>

@@ -58,6 +58,7 @@
 }
 
 .CreateBox:hover {
+  cursor: pointer;
   @apply bg-gray-200;
 }
 
