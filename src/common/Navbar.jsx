@@ -19,6 +19,16 @@ const Navbar = () => {
             생성
           </div>
         </div>
+        <Link to={"/pc"}>
+        <div className='AddBox'>
+          <div className='AddBtn'>
+            +
+          </div>
+          <div className='AddTextBox'>
+            파일추가
+          </div>
+        </div>
+        </Link>
         <Link to={"/user"}>
         <div className='HomeBox'>
           <div className='HomeIcon' />

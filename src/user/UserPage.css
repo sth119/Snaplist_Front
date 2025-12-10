@@ -1,0 +1,62 @@
+
+
+
+.UserMainSection {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 24px;
+    padding: 20px;
+    justify-content: center;
+}
+
+.FileBox {
+    /* border-style: solid;
+    border-width: 1px;
+    border-color: red; */
+    /* ================================================ */
+    /* transition: all 0.2s ease; */
+    border-radius: 8px;
+    padding: 12px;
+    /* ================================================ */  
+
+
+    @apply
+    items-center
+    h-32
+    w-28
+    text-center
+}
+
+.FileIcon {
+    background-image: url('../assets/file2.png');
+    background-size: contain;     
+    background-repeat: no-repeat;  
+    background-position: center;
+
+    @apply
+    h-24
+}
+
+
+/* ================================================ */
+
+.FileBox:hover {
+  background: #f5f9ff;
+}
+
+
+.FileBox.selected {
+  background: #e3f2fd !important;
+  /* border: 2px solid #2196f3; */
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+}
+
+
+/* a 태그 기본 파란색/밑줄 없애기 */
+.block {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  margin: 8px;
+}
+/* ================================================ */

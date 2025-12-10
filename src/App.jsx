@@ -9,7 +9,7 @@ function HeaderWithNavbar() {
         <Header />
       <div className='flex flex-1'>
       <Navbar />
-        <div className="flex-1 relative">
+        <div className="flex-1">
           <Outlet />
           <CreateModal />
         </div>
@@ -36,20 +36,27 @@ function CreateModal() {
 
   if (!showModal) return null;
 
+  const handleKey = (e) => {
+        if ( e.key === 'Enter' && !e.shiftKey) { // shift + Enter 는 제외
+            e.preventDefault(); // 폼 제출 방지
+            createLink();
+        }
+    };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]" onClick={closeModal}>
-      <div className="bg-gray-200 rounded-lg shadow-2xl p-8 w-full max-w-md mx-4 border-2 border-red-500" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-gray-200 rounded-lg shadow-2xl p-8 w-full max-w-md mx-4 border-2 border-red-500 " onClick={(e) => e.stopPropagation()}>
         <h2 style={{ margin: '0 0 24px 0', textAlign: 'center' }}>새 링크 추가</h2>
         
-        <div className='flex flex-col'>
+        <div className='flex flex-col space-y-2'>
         <label>title</label>
         <input
           type="text"
-          placeholder="TITLE"
+          placeholder="title"
           value={newLink.title}
           onChange={(e) => setNewLink({ ...newLink, title: e.target.value })}
           autoFocus
-          className='rounded-md border border-red-500'
+          className='rounded-md border border-red-500 pl-2'
         />
         
         <label>url</label>
@@ -58,7 +65,9 @@ function CreateModal() {
           placeholder="URL"
           value={newLink.url}
           onChange={(e) => setNewLink({ ...newLink, url: e.target.value })}
-          className='rounded-md border border-red-500'
+          className='rounded-md border border-red-500 pl-2'
+          onKeyDown={handleKey}
+          
         />
         </div>
 

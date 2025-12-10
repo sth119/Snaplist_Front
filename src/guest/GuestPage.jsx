@@ -1,21 +1,31 @@
 import { useFile } from '../common/Context';
+import "./GuestPage.css"
+
 
 const GuestPage = () => {
   const { files } = useFile();
 
   return (
-    <div className="file-grid">
+    <div className="GuestMainSection">
       {files.length === 0 ? (
         <p style={{textAlign: 'center', color: '#999', marginTop: '50px'}}>
-          아직 링크가 없어요.<br/>좌측 + 생성 버튼을 눌러 추가해보세요!
+          <br/>+ 생성 버튼을 눌러 링크 추가 
         </p>
       ) : (
         files.map(file => (
-          <div key={file.id} className="file-item">
-            <div className="icon">Link</div>
+          <a
+            key={file.id}
+            href={file.url}
+            target='_blank'
+            rel='noopener noreferrer'
+            className='block'
+          >
+          <div key={file.id} className="FileBox">
+            <div className="FileIcon"></div>
             <p>{file.title}</p>
-            <small style={{wordBreak: 'break-all'}}>{file.url}</small>
+            {/* <small style={{wordBreak: 'break-all'}}>{file.url}</small> */}
           </div>
+          </a>
         ))
       )}
     </div>

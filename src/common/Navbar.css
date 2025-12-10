@@ -20,8 +20,8 @@
     flex
     flex-grow
     flex-col
-    flex-shrink-0
     justify-start
+    flex-shrink-0
     w-48
     max-w-48
     bg-gray-300
@@ -31,8 +31,11 @@
 
 .OptionBox {
   @apply
-  space-y-2
-  px-2
+  flex
+  flex-col
+  flex-1
+  py-2
+  justify-evenly
 }
 
 
@@ -48,7 +51,6 @@
   @apply
      flex
      flex-row
-     mt-32
      h-14
      bg-white
      mx-4
@@ -98,6 +100,70 @@
   @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
 }
 
+
+
+/* ====================== Add ====================== */
+
+
+
+.AddBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red; */
+      
+  @apply
+     flex
+     flex-row
+     h-14
+     bg-white
+     mx-4
+     rounded-lg
+    transition-colors duration-200;   /* 부드럽게 */
+     
+}
+
+.AddBox:hover {
+  cursor: pointer;
+  @apply bg-gray-200;
+}
+
+
+.AddBtn,
+.AddTextBox {
+  /* border-style: solid;
+  border-width: 1px;
+  border-color: red;  */
+
+  @apply
+    flex
+    flex-1
+    justify-center
+    items-center
+    bg-white
+    rounded-lg
+    transition-colors duration-200;
+}
+
+
+
+.AddBtn {
+  @apply
+    text-3xl
+    font-bold
+}
+
+.AddTextBox {
+  @apply
+    text-lg
+    font-medium
+}
+
+.AddBox:hover .AddBtn,
+.AddBox:hover .AddTextBox {
+  @apply bg-transparent;   
+}
+
+
 /* ====================== Home ====================== */
 
 .HomeBox {
@@ -108,7 +174,6 @@
   @apply
      flex
      flex-row
-     mt-32
      h-14
      bg-white
      mx-4
@@ -160,8 +225,7 @@
 .HomeBox:hover .HomeTextBox {
   @apply bg-transparent;   /* ← 이거 두 줄이 핵심! */
 }
-
-
+  
 /* ====================== Photo ====================== */
 
 .PhotoBox {
@@ -172,7 +236,6 @@
   @apply
      flex
      flex-row
-     mt-32
      h-14
      bg-white
      mx-4
@@ -236,7 +299,6 @@
   @apply
      flex
      flex-row
-     mt-32
      h-14
      bg-white
      mx-4
@@ -300,7 +362,6 @@
   @apply
      flex
      flex-row
-     mt-32
      h-14
      bg-white
      mx-4

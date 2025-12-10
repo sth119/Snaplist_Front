@@ -20,17 +20,22 @@ export function FileProvider({ children }) {
         if(!newLink.title.trim() || !newLink.url.trim()) {
             return;
         }
+
+        let fullUrl = newLink.url.trim();
+
+        if (!fullUrl.startsWith('https://') && !fullUrl.startsWith('https://')) {
+            fullUrl = 'https://' + fullUrl;
+        }
     
-
-
+    
     const newFile = {
         id: Date.now(),
         title: newLink.title.trim(),
-        url: newLink.url.trim(),
+        url: fullUrl,
         type: 'link',
         createdAt: new Date().toISOString()
-    };
-
+    };    
+    
     setFiles(prev => [ ...prev, newFile ]);
 
     closeModal();
