@@ -6,6 +6,7 @@ import GuestPage from "./guest/GuestPage";
 import Navbar from "./common/Navbar";
 import UserPage from "./user/UserPage";
 import LoginPage from "./LoginPage/LoginPage";
+import Trash from './common/Trash'
 
 
 
@@ -21,6 +22,7 @@ export {
     Navbar,
     UserPage,
     LoginPage,
+    Trash,
 };
 
 

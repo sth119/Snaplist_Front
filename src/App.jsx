@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
-import { Main , Header, GuestPage, Navbar, LoginPage, UserPage } from './Bridge';
+import { Main , Header, GuestPage, Navbar, LoginPage, UserPage, Trash } from './Bridge';
 import { FileProvider, useFile } from "./common/Context";
 
 function HeaderWithNavbar() {
@@ -96,6 +96,7 @@ function App() {
           <Route element={<HeaderWithNavbar />}>
             <Route path="/guest" element={<GuestPage />} />
             <Route path="/user" element={<UserPage />} />
+            <Route path="/Trash" element={<Trash />} />
           </Route>
           <Route element={<OnlyHeader />}>
             <Route path="/" element={<Main />} />

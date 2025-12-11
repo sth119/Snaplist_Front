@@ -51,13 +51,16 @@ const Navbar = () => {
           </div>
         </div>
 
+        <Link to={"/Trash"}>
         <div className='TrashBox'>
           <div className='TrashIcon' />
           <div className='TrashTextBox'>
             휴지통
           </div>
         </div>
-      </div>
+        </Link>
+      </div> {/* option box */}
+
       <div className='LoginSettingBox'>
         <div className='Setting' />
         <Link to='/login'>

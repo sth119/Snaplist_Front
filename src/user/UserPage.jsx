@@ -1,13 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Navbar } from '../Bridge'
 import { useFile } from '../common/Context'
 import '../user/UserPage.css'
 
 const UserPage = () => {
-  const { files } = useFile();
+  const { files, 
+          moveTrash,
+          setContextMenu,
+          handleContextMenu,
+          selectedIds,
+          setSelectedIds,
+          contextMenu,
+        } = useFile();
 
-
-  const [selectedIds, setSelectedIds ] = useState(new Set());
+  const visibleFiles = files.filter(file => !file.trashed);
 
   const handleClick = (e, fileId) => {
 
@@ -31,14 +37,31 @@ const UserPage = () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   };
 
+
+  // ★★★ 5번: Del 키로 바로 휴지통 이동 (여기 추가!!!)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Delete' && selectedIds.size > 0) {
+        e.preventDefault();
+        moveTrash(selectedIds);  // 선택된 거 바로 휴지통으로
+        setSelectedIds(new Set());  // 선택 해제
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedIds, moveTrash]);  // 의존성 배열에 moveTrash 추가
+
+
   return (
+
+    
     <div className="UserMainSection">
       {files.length === 0 ? (
         <p style={{textAlign: 'center', color: '#999', marginTop: '50px'}}>
           <br/> 유저 Main 화면 입니다. 
         </p>
       ) : (
-        files.map(file => (
+        visibleFiles.map(file => (
           <a
             key={file.id}
             href={file.url}
@@ -50,6 +73,9 @@ const UserPage = () => {
             // 핵심: 클릭과 더블클릭 분리
             onClick={(e) => handleClick(e, file.id)}
             onDoubleClick={() => handleDoubleClick(file.url)}
+
+            // 우클릭 이벤트
+            onContextMenu={(e) => handleContextMenu(e, file.id)}
             
             // 선택됐는지 표시용 data 속성
             data-selected={selectedIds.has(file.id)}
@@ -66,6 +92,48 @@ const UserPage = () => {
           </a>
         ))
       )}
+
+
+      {/* ★★★ 우클릭 컨텍스트 메뉴 (여기 추가!!!) ★★★ */}
+      {contextMenu && (
+        <div
+          style={{
+            position: 'fixed',
+            top: `${contextMenu.y}px`,
+            left: `${contextMenu.x}px`,
+            background: 'white',
+            border: '1px solid #ccc',
+            borderRadius: '8px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+            zIndex: 10000,
+            padding: '8px 0',
+            minWidth: '180px',
+            fontSize: '14px'
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            style={{
+              padding: '12px 20px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+            onClick={() => {
+              if (contextMenu.fileId !== null) {
+                moveTrash(new Set([contextMenu.fileId]));
+              }
+              setContextMenu(null);
+            }}
+          >
+            휴지통으로 이동
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
