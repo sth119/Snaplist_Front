@@ -112,6 +112,7 @@ export function FileProvider({ children }) {
             setContextMenu,
             setSelectedIds,
             handleContextMenu,
+            setFiles,
         }}>
         {children}
         </FileContext.Provider>

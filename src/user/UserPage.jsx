@@ -2,9 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { Navbar } from '../Bridge'
 import { useFile } from '../common/Context'
 import '../user/UserPage.css'
+////////////////////////////////////////
+// import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+// import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable';
+// import { useSortable } from '@dnd-kit/sortable';
+// import { CSS } from '@dnd-kit/utilities';
+////////////////////////////////////////
+
 
 const UserPage = () => {
-  const { files, 
+  const { files,
+          setFiles, 
           moveTrash,
           setContextMenu,
           handleContextMenu,
@@ -14,6 +22,64 @@ const UserPage = () => {
         } = useFile();
 
   const visibleFiles = files.filter(file => !file.trashed);
+
+  ///////////////////    DRAG    ////////////////////////////////
+  const [ dragIndex, setDragIndex ] = useState(null);
+
+  const handleDragStart = (e, index) => {
+    setDragIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index);  // 필요시
+    // 드래그 이미지 커스텀 (옵션)
+    // e.dataTransfer.setDragImage(e.target, 0, 0);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();  // 드롭 허용 필수!
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e, dropIndex) => {
+    e.preventDefault();
+    if (dragIndex === null || dragIndex === dropIndex) return;
+
+    const newVisibleFiles = [...visibleFiles];
+    const [draggedItem] = newVisibleFiles.splice(dragIndex, 1);
+    newVisibleFiles.splice(dropIndex, 0, draggedItem);
+
+    // 전체 files 재정렬 (trashed 파일은 그대로)
+    // const newFiles = files.map(file => {
+    //   if (file.trashed) return file;
+    //   const found = newVisibleFiles.find(f => f.id === file.id);
+    //   return found || file;
+    // });
+
+    //////////////////////////////////////////////////////
+    const newFiles = [
+    ...files.filter(file => file.trashed),  // trashed 파일 먼저
+    ...newVisibleFiles                      // 새 순서의 visible 파일
+    ];
+  //////////////////////////////////////////// drag 후 index 가 볕경되지 않는 문제로 인해 바꾼 로직
+
+    setFiles(newFiles);
+    setDragIndex(null);
+
+    console.log('드롭! 이전 인덱스:', dragIndex, '새 인덱스:', dropIndex);
+console.log('새 files:', newFiles);
+
+  };
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+  };
+
+  /////////////////////////////////////////////////////////
+
+
 
   const handleClick = (e, fileId) => {
 
@@ -56,18 +122,26 @@ const UserPage = () => {
 
     
     <div className="UserMainSection">
-      {files.length === 0 ? (
+      {visibleFiles.length === 0 ? (
         <p style={{textAlign: 'center', color: '#999', marginTop: '50px'}}>
           <br/> 유저 Main 화면 입니다. 
         </p>
       ) : (
-        visibleFiles.map(file => (
+        visibleFiles.map((file, index) => (
           <a
             key={file.id}
             href={file.url}
             target='_blank'
             rel='noopener noreferrer'
             className='block'
+            /////////////// DRAG /////////////////////////////
+
+            draggable="true"  // ★ 드래그 가능하게
+            onDragStart={(e) => handleDragStart(e, index)}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
 
             //////////////////////////////////////////////////
             // 핵심: 클릭과 더블클릭 분리
