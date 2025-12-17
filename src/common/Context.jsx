@@ -9,6 +9,12 @@ export function FileProvider({ children }) {
     const [contextMenu, setContextMenu] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set());
 
+    //////////////////////////////////////////////
+    // ★★★ 로그인 상태 (나중에 JWT로 대체)
+    const currentUser = null; // 예: { id: 1, username: 'test' } 또는 null (게스트)
+    const token = null; // JWT 토큰 (로그인 후 설정)
+    //////////////////////////////////////////////
+
     const openModal = () => {
         setShowModal(true);
         setNewLink({ title: '' , url: ''});
@@ -16,9 +22,38 @@ export function FileProvider({ children }) {
 
     const closeModal = () => {
         setShowModal(false);
-    }
+    };
 
-    const createLink = () => {
+    ///////////////////////////////////////////////////////
+    // 서버에서 파일 불러오기 (로그인 시)
+    const fetchFilesFromServer = async () => {
+        if (!currentUser || !token) return;
+        try {
+            const response = await fetch('/api/files', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const serverFiles = await response.json();
+                setFiles(serverFiles);
+            }
+        } catch (error) {
+            console.error('서버 파일 불러오기 실패', error);
+        }
+    };
+
+    // 앱 시작 시 파일 로드
+    useEffect(() => {
+        if (currentUser) {
+            fetchFilesFromServer();
+        } else {
+            const localFiles = JSON.parse(localStorage.getItem('guestFiles') || '[]');
+            setFiles(localFiles);
+        }
+    }, [currentUser]);
+
+    ///////////////////////////////////////////////////////
+
+    const createLink = async () => {
         if(!newLink.title.trim() || !newLink.url.trim()) {
             return;
     }
@@ -38,6 +73,37 @@ export function FileProvider({ children }) {
         createdAt: new Date().toISOString(),
         trashed: false
     };    
+
+    ////////////////////////////////////////////////////
+    if (currentUser && token) {
+            // 로그인: 서버에 저장
+            try {
+                const response = await fetch('/api/files', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        title: newFile.title,
+                        url: newFile.url,
+                        type: newFile.type
+                    })
+                });
+                if (response.ok) {
+                    const savedFile = await response.json();
+                    setFiles(prev => [...prev, savedFile]);
+                }
+            } catch (error) {
+                console.error('서버 저장 실패', error);
+            }
+        } else {
+            // 게스트: localStorage에 저장
+            const updatedFiles = [...files, newFile];
+            setFiles(updatedFiles);
+            localStorage.setItem('guestFiles', JSON.stringify(updatedFiles));
+        }
+    ///////////////////////////////////////////////
     
     setFiles(prev => [ ...prev, newFile ]);
 
