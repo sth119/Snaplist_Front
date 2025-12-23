@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Outlet } from "react-router-dom";
 import { Main , Header, GuestPage, Navbar, LoginPage, UserPage, Trash } from './Bridge';
 import { FileProvider, useFile } from "./common/Context";
+import { AuthProvider } from "./common/AuthContext";
 
 function HeaderWithNavbar() {
   return (
@@ -89,6 +90,7 @@ function CreateModal() {
 
 function App() {
   return (
+    <AuthProvider>
     <FileProvider>
     <BrowserRouter>
     
@@ -105,6 +107,7 @@ function App() {
         </Routes>
     </BrowserRouter>
     </FileProvider>
+    </AuthProvider>
   )
 }
 

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useAuth } from './AuthContext';
 
 const FileContext = createContext();
 
@@ -11,8 +12,7 @@ export function FileProvider({ children }) {
 
     //////////////////////////////////////////////
     // ★★★ 로그인 상태 (나중에 JWT로 대체)
-    const currentUser = null; // 예: { id: 1, username: 'test' } 또는 null (게스트)
-    const token = null; // JWT 토큰 (로그인 후 설정)
+    const { user, token } = useAuth(); // 예: { id: 1, username: 'test' } 또는 null (게스트)
     //////////////////////////////////////////////
 
     const openModal = () => {
@@ -27,7 +27,7 @@ export function FileProvider({ children }) {
     ///////////////////////////////////////////////////////
     // 서버에서 파일 불러오기 (로그인 시)
     const fetchFilesFromServer = async () => {
-        if (!currentUser || !token) return;
+        if (!user || !token) return;
         try {
             const response = await fetch('/api/files', {
                 headers: { Authorization: `Bearer ${token}` }
@@ -43,13 +43,18 @@ export function FileProvider({ children }) {
 
     // 앱 시작 시 파일 로드
     useEffect(() => {
-        if (currentUser) {
+        if (user) {
+            const guestFiles = localStorage.getItem('guestFiles')
+
+            if(guestFiles) {
+                localStorage.removeItem('guestFiles');
+            }
             fetchFilesFromServer();
         } else {
             const localFiles = JSON.parse(localStorage.getItem('guestFiles') || '[]');
             setFiles(localFiles);
         }
-    }, [currentUser]);
+    }, [user]);
 
     ///////////////////////////////////////////////////////
 
@@ -75,7 +80,7 @@ export function FileProvider({ children }) {
     };    
 
     ////////////////////////////////////////////////////
-    if (currentUser && token) {
+    if (user && token) {
             // 로그인: 서버에 저장
             try {
                 const response = await fetch('/api/files', {
