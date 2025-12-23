@@ -95,7 +95,7 @@ const LoginPage = () => {
             </label>
           </div>
           <div className='Register'>
-            <Link to={"/guest"}>회원가입</Link>
+            <Link to={"/signup"}>회원가입</Link>
           </div>
         </div>
         <button type='submit' className='LoginCheck'>
