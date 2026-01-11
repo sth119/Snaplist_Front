@@ -9,7 +9,7 @@ export function FileProvider({ children }) {
     const [newLink, setNewLink] = useState({ title: '', url: '' });
     const [contextMenu, setContextMenu] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set());
-
+    
     //////////////////////////////////////////////
     // ★★★ 로그인 상태 (나중에 JWT로 대체)
     const { user, token } = useAuth(); // 예: { id: 1, username: 'test' } 또는 null (게스트)
@@ -43,15 +43,19 @@ export function FileProvider({ children }) {
 
     // 앱 시작 시 파일 로드
     useEffect(() => {
+
+        // clear localstorage
+        localStorage.removeItem('guestFiles');
+
         if (user) {
-            const guestFiles = localStorage.getItem('guestFiles')
+            const guestFiles = sessionStorage.getItem('guestFiles')
 
             if(guestFiles) {
-                localStorage.removeItem('guestFiles');
+                sessionStorage.removeItem('guestFiles');
             }
             fetchFilesFromServer();
         } else {
-            const localFiles = JSON.parse(localStorage.getItem('guestFiles') || '[]');
+            const localFiles = JSON.parse(sessionStorage.getItem('guestFiles') || '[]');
             setFiles(localFiles);
         }
     }, [user]);
@@ -106,11 +110,11 @@ export function FileProvider({ children }) {
             // 게스트: localStorage에 저장
             const updatedFiles = [...files, newFile];
             setFiles(updatedFiles);
-            localStorage.setItem('guestFiles', JSON.stringify(updatedFiles));
+            sessionStorage.setItem('guestFiles', JSON.stringify(updatedFiles));
         }
     ///////////////////////////////////////////////
     
-    setFiles(prev => [ ...prev, newFile ]);
+    
 
     closeModal();
     setNewLink({ title: '', url: ''});
@@ -141,29 +145,45 @@ export function FileProvider({ children }) {
         
     }, [contextMenu]);
 
+    const updateGuestStorage = (updatedFiles) => {
+        if (!user) {
+            sessionStorage.setItem('guestFiles', JSON.stringify(updatedFiles));
+        }
+    };
 
     const moveTrash = (moveTrashFile) => {
-        setFiles(prevFiles => 
-            prevFiles.map(file =>
+        setFiles(prevFiles => {
+             const updated = prevFiles.map(file =>
                 moveTrashFile.has(file.id)
                 ? { ...file, trashed: true }
                 : file
-            )
-        );
+            );
+
+                updateGuestStorage(updated);
+
+                return updated;
+    });
     };
 
     const restoreTrash = (reviveTrash) => {
-        setFiles(prevFiles => 
-            prevFiles.map(file => 
+        setFiles(prevFiles => {
+             const updated = prevFiles.map(file =>  
                 reviveTrash.has(file.id) ? { ...file, trashed: false } : file
-            )
-        );
+            );
+
+                updateGuestStorage(updated);
+                
+                return updated;
+        });
     };
 
     const deleteTrash = (fileDelete) => {
-        setFiles(prevFiles =>
-            prevFiles.filter(file => !fileDelete.has(file.id))
-        );
+        setFiles(prevFiles => {
+            const updated = prevFiles.filter(file => !fileDelete.has(file.id));
+            updateGuestStorage(updated);
+
+            return updated;
+    });
     };
 
     return (
