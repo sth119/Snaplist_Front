@@ -1,17 +1,52 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import "./Navbar.css"
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
 import { useFile } from './Context'
-// import { useAuth } from './AuthContext'
+import { useAuth } from './AuthContext'
 
 const Navbar = () => {
-  const { openModal } = useFile();
-  // const { user, logout } = useAuth();
+  const { openModal, uploadFile } = useFile();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const fileInputRef = useRef(null);
+  const isGuestPage = location.pathname.startsWith('/guest');
 
 
+  const handleProfileClick =  () => {
+    if ( window.confirm('로그아웃하시겠습니까?')) {
+      logout();
+      navigate('/login');
+    }
+  };
+
+  // ★ "파일추가" 버튼 클릭 시 실행
+  const handleAddFileClick = () => {
+    // 숨겨진 파일 input을 강제로 클릭시킴
+    fileInputRef.current.click();
+  };
+
+  // ★ 파일이 선택되면 실행되는 함수
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        // 여기서 바로 업로드 함수 호출!
+        uploadFile(file);
+    }
+    // 같은 파일을 다시 올릴 수도 있으니 input 초기화
+    e.target.value = '';
+  };
 
   return (
     <div className='Navbar'>
+
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        style={{ display: 'none' }} 
+        onChange={handleFileChange}
+      />
+
       <div className='OptionBox'>
         <div className='CreateBox' onClick={openModal}>
           <div className='CreateBtn'>
@@ -21,8 +56,7 @@ const Navbar = () => {
             생성
           </div>
         </div>
-        <Link to={"/pc"}>
-        <div className='AddBox'>
+        <div className='AddBox'  onClick={handleAddFileClick}>
           <div className='AddBtn'>
             +
           </div>
@@ -30,7 +64,6 @@ const Navbar = () => {
             파일추가
           </div>
         </div>
-        </Link>
         <Link to={"/user"}>
         <div className='HomeBox'>
           <div className='HomeIcon' />
@@ -63,12 +96,15 @@ const Navbar = () => {
         </Link>
       </div> {/* option box */}
 
+      {!isGuestPage && (
       <div className='LoginSettingBox'>
         <div className='Setting' />
-        <Link to='/login'>
-        <div className='GoLoginPage' />
-        </Link>
+        <button
+          onClick={handleProfileClick}
+          className='GoLoginPage'
+        ></button>
       </div>
+      )}
     </div>
   )
 }

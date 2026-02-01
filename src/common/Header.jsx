@@ -11,7 +11,21 @@ const Header = () => {
   const location = useLocation();
 
   const mainPage = location.pathname === '/';
+  const userPage = location.pathname === '/user';
   const guestPage = location.pathname.startsWith('/guest');
+  const signUpPage = location.pathname === '/signup';
+  const loginPage = location.pathname === '/login';
+  // const logoLink = user ? '/user' : '/guest';
+
+  let logoLink = '/';
+
+  if(user) {
+    logoLink = '/user';
+  } else if (guestPage) {
+    logoLink = '/guest';
+  } else {
+    logoLink = '/';
+  }
 
   const handleProfileClick =  () => {
     if ( window.confirm('로그아웃하시겠습니까?')) {
@@ -24,11 +38,11 @@ const Header = () => {
   return (
 
     <div className="header">
-      <Link to={"/"}>
+      <Link to={logoLink}>
         <span  className='title'>SnapList</span>
       </Link>
 
-      {!mainPage && (
+      {!mainPage && !signUpPage && !loginPage && (
         <div className='header-right'>
           {user ? (
             // user 화면

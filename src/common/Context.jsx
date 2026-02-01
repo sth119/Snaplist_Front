@@ -10,9 +10,10 @@ export function FileProvider({ children }) {
     const [contextMenu, setContextMenu] = useState(null);
     const [selectedIds, setSelectedIds] = useState(new Set());
     
+    
 
     //////////////////////////////////////////////
-    // ★★★ 로그인 상태 (나중에 JWT로 대체)
+    // ★★★ 로그인 상태 (나중에 JWT로 대체) // 파일 업로드도 사용
     const { user, token } = useAuth(); // 예: { id: 1, username: 'test' } 또는 null (게스트)
     //////////////////////////////////////////////
 
@@ -299,6 +300,42 @@ export function FileProvider({ children }) {
         }
     };
 
+    //=================================================================================//
+    // ★ [추가] 파일 업로드 함수
+    const uploadFile = async (file) => {
+        if (!user || !token) {
+            alert("로그인이 필요한 기능입니다.");
+            return;
+        }
+
+        // 1. FormData 생성 (파일 전송용 택배 상자)
+        const formData = new FormData();
+        formData.append("file", file); // 백엔드의 @RequestParam("file")과 이름이 같아야 함
+
+        try {
+            const response = await fetch('http://localhost:8080/api/files/upload', {
+                method: 'POST',
+                headers: {
+                    // ★ 중요: Content-Type은 적지 않습니다! 
+                    // 브라우저가 알아서 multipart/form-data로 설정합니다.
+                    Authorization: `Bearer ${token}` 
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                // 성공하면 목록 새로고침
+                await fetchFilesFromServer(); 
+                alert("파일 업로드가 완료되었습니다.");
+            } else {
+                const errorText = await response.text();
+                alert("업로드 실패: " + errorText);
+            }
+        } catch (error) {
+            console.error("업로드 중 오류 발생", error);
+            alert("서버 오류가 발생했습니다.");
+        }
+    };
 
     return (
         <FileContext.Provider value={{
@@ -318,6 +355,7 @@ export function FileProvider({ children }) {
             setSelectedIds,
             handleContextMenu,
             setFiles,
+            uploadFile,
         }}>
         {children}
         </FileContext.Provider>
