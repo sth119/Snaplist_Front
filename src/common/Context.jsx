@@ -222,7 +222,7 @@ export function FileProvider({ children }) {
     const moveTrash = async (moveTrashFile) => {
         if (user && token) {
             try {
-                await fetch('http://localhost:8080/api/files/trash', {
+                const response = await fetch('http://localhost:8080/api/files/trash', {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
@@ -231,8 +231,13 @@ export function FileProvider({ children }) {
                     // Set을 Array로 변환해서 전송
                     body: JSON.stringify(Array.from(moveTrashFile))
                 });
+
+                if(response.ok) {
                 fetchFilesFromServer(); // 서버 데이터로 동기화
                 setSelectedIds(new Set()); // 선택 초기화
+                } else {
+                    console.error("휴지통 이동 실패: " , await response.text());
+                }
             } catch (err) { console.error(err); }
         } else {
             // 게스트 로직 (기존 유지)
