@@ -99,9 +99,14 @@ console.log('새 files:', newFiles);
     });
   };
 
-  const handleDoubleClick = (url) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
+  const handleDoubleClick = (file) => {
+    // 파일 타입이면 백엔드 서버(8080) 주소를 붙이고, 아니면(일반 링크면) 그냥 원래 주소 사용
+    const targetUrl = file.type === 'file'
+      ? `http://localhost:8080${file.url}` 
+      : file.url;
+
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
+};
 
 
   // ★★★ 5번: Del 키로 바로 휴지통 이동 (여기 추가!!!)
@@ -146,7 +151,11 @@ console.log('새 files:', newFiles);
             //////////////////////////////////////////////////
             // 핵심: 클릭과 더블클릭 분리
             onClick={(e) => handleClick(e, file.id)}
-            onDoubleClick={() => handleDoubleClick(file.url)}
+            //onDoubleClick={() => handleDoubleClick(file.url)}
+            onDoubleClick={(e) => {
+              e.stopPropagation(); // 클릭 간섭 방지
+              handleDoubleClick(file); // url이 아니라 file 객체 전체를 넘겨줍니다!
+            }}
 
             // 우클릭 이벤트
             onContextMenu={(e) => handleContextMenu(e, file.id)}
