@@ -22,8 +22,14 @@ const Navbar = () => {
 
   // ★ "파일추가" 버튼 클릭 시 실행
   const handleAddFileClick = () => {
+    navigate('/user');
     // 숨겨진 파일 input을 강제로 클릭시킴
     fileInputRef.current.click();
+  };
+
+  const handleCreateClick = () => {
+  navigate('/user'); // 1. 홈 화면(/user)으로 먼저 이동!
+  openModal();       // 2. Context에 있는 모달창 띄우기!
   };
 
   // ★ 파일이 선택되면 실행되는 함수
@@ -37,6 +43,8 @@ const Navbar = () => {
     e.target.value = '';
   };
 
+
+
   return (
     <div className='Navbar'>
 
@@ -47,8 +55,18 @@ const Navbar = () => {
         onChange={handleFileChange}
       />
 
-      <div className='OptionBox'>
-        <div className='CreateBox' onClick={openModal}>
+      
+        <Link to={"/user"}>
+        <div className='HomeBox'>
+          <div className='HomeIcon' />
+          <div className='HomeTextBox'>
+            홈
+          </div>
+        </div>
+        </Link>
+
+        <div className='OptionBox'>
+        <div className='CreateBox' onClick={handleCreateClick}>
           <div className='CreateBtn'>
             +
           </div>
@@ -64,14 +82,7 @@ const Navbar = () => {
             파일추가
           </div>
         </div>
-        <Link to={"/user"}>
-        <div className='HomeBox'>
-          <div className='HomeIcon' />
-          <div className='HomeTextBox'>
-            홈
-          </div>
-        </div>
-        </Link>
+        
         <div className='PhotoBox'>
           <div className='PhotoIcon' />
           <div className='PhotoTextBox'>

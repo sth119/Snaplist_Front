@@ -27,7 +27,8 @@
     text-center
 }
 
-.FileIcon {
+.FileIcon,
+.LinkIcon {
     background-image: url('../assets/file2.png');
     background-size: contain;     
     background-repeat: no-repeat;  
@@ -60,3 +61,36 @@
   margin: 8px;
 }
 /* ================================================ */
+
+/* 1. 썸네일(이미지 또는 아이콘)을 담는 통일된 상자 */
+.FileThumbnailBox {
+    width: 100%;            /* 부모 너비에 맞춤 */
+    height: 80px;           /* 높이 고정 (중요!) */
+    display: flex;          /* 내부 요소 중앙 정렬을 위해 flex 사용 */
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center;     /* 세로 중앙 정렬 */
+    margin-bottom: 10px;    /* 제목과의 간격 */
+    /* background-color: #f8f9fa;  (선택사항) 썸네일 배경색 연하게 깔기 */
+    border-radius: 4px;
+    overflow: hidden;       /* 삐져나가는 것 자르기 */
+}
+
+/* 2. 상자 안에 들어가는 실제 이미지 스타일 */
+.FileThumbnailBox img {
+    width: 100%;
+    height: 100%;
+    /* object-fit: cover; -> 이미지를 꽉 채우지만 잘릴 수 있음 (현재 상태) */
+    object-fit: contain; /* -> 이미지가 잘리지 않고 전체가 다 보이게 함 (추천!) */
+}
+
+/* 3. 상자 안에 들어가는 아이콘 스타일 (크기 지정 필수!) */
+/* 기존의 .FileIcon, .LinkIcon 클래스가 배경이미지를 가지고 있다고 가정합니다. */
+.FileThumbnailBox .FileIcon,
+.FileThumbnailBox .LinkIcon {
+    width: 50px;  /* 아이콘 너비 고정 */
+    height: 50px; /* 아이콘 높이 고정 */
+    /* 배경 이미지가 중앙에 오고 반복되지 않게 설정 */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: contain; 
+}

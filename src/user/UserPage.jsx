@@ -23,7 +23,10 @@ const UserPage = () => {
 
   const visibleFiles = files.filter(file => !file.trashed);
 
-  ///////////////////    DRAG    ////////////////////////////////
+  /////////////////////////////////////////////////////////      
+  //// Drag 드레그 로직
+  /////////////////////////////////////////////////////////
+
   const [ dragIndex, setDragIndex ] = useState(null);
 
   const handleDragStart = (e, index) => {
@@ -78,8 +81,8 @@ console.log('새 files:', newFiles);
   };
 
   /////////////////////////////////////////////////////////
-
-
+  //// 클릭 로직
+  /////////////////////////////////////////////////////////
 
   const handleClick = (e, fileId) => {
 
@@ -121,6 +124,50 @@ console.log('새 files:', newFiles);
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedIds, moveTrash]);  // 의존성 배열에 moveTrash 추가
+
+  /////////////////////////////////////////////////////////
+
+  /////////////////////////////////////////////////////////
+  //// 파일 다운로드 로직
+  /////////////////////////////////////////////////////////
+
+  const handleDownload = async (fileId) => {
+
+    const file = visibleFiles.find(f => f.id === fileId);
+    if(!file) return;
+
+    if(file.type === 'link') {
+      alert("링크 파일은 현재 다운로드를 지원하지 않습니다.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:8080${file.url}`);
+      if (!response.ok) throw new Error("네트워크 응답 오류");
+
+      const blob = await response.blob();
+
+      const downloadUrl = window.URL.createObjectURL(blob);
+
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = file.title;
+      document.body.appendChild(link);
+      link.click();
+
+      // 다운로드가 끝나면 임시 링크와 태그 지우기
+      link.remove();
+      window.URL.revokeObjectURL(downloadUrl);
+
+      
+    } catch (error) {
+      console.error("다운로드 관련 에러:", error);
+      alert("파일 다운로드에 실패했습니다.");
+    }
+  };
+
+  
+
 
 
   return (
@@ -164,37 +211,78 @@ console.log('새 files:', newFiles);
             data-selected={selectedIds.has(file.id)}
             //////////////////////////////////////////////////
           >
-          {/*============================================================ */}
+          
           <div className={`FileBox ${selectedIds.has(file.id) ? 'selected' : ''}`} >
-          {/*============================================================ */}
-          {/* <div key={file.id} className="FileBox"> */}
-            <div className="FileIcon"></div>
-            <p>{file.title}</p>
-            {/* <small style={{wordBreak: 'break-all'}}>{file.url}</small> */}
+
+          {/* ================= [수정된 썸네일 영역] ================= */}
+          {/* 1. 이미지든 아이콘이든 통일된 상자(.FileThumbnailBox)로 감쌉니다. */}
+          <div className="FileThumbnailBox">
+              {file.type === 'file' && file.title.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+                // Case A: 이미지 파일일 때 -> <img> 태그 사용
+                <img 
+                  src={`http://localhost:8080${file.url}`} 
+                  alt={file.title}
+                  // (CSS 파일에서 스타일을 관리하므로 인라인 스타일 제거됨)
+                  onError={(e) => { 
+                    // 이미지 로딩 실패 시, 부모 상자에 아이콘 클래스를 줘서 아이콘을 띄움
+                    e.target.style.display = 'none'; // 깨진 이미지 숨김
+                    e.target.parentNode.classList.add('FileIcon'); // 부모에게 아이콘 클래스 추가
+                  }}
+                />
+              ) : (
+                // Case B: 링크거나 이미지가 아닐 때 -> 아이콘 div 사용
+                // 이 div는 CSS에 의해 너비/높이를 가져서 이제 보일 겁니다!
+                <div className={file.type === 'link' ? 'LinkIcon' : 'FileIcon'}></div>
+              )}
           </div>
+          {/* ========================================================= */}
+
+          <p>{file.title}</p>
+        </div>
           </a>
         ))
       )}
 
 
-      {/* ★★★ 우클릭 컨텍스트 메뉴 (여기 추가!!!) ★★★ */}
-      {contextMenu && (
-        <div
-          style={{
-            position: 'fixed',
-            top: `${contextMenu.y}px`,
-            left: `${contextMenu.x}px`,
-            background: 'white',
-            border: '1px solid #ccc',
-            borderRadius: '8px',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-            zIndex: 10000,
-            padding: '8px 0',
-            minWidth: '180px',
-            fontSize: '14px'
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
+          {/* ★★★ 우클릭 컨텍스트 메뉴 (여기 추가!!!) ★★★ */}
+          {contextMenu && (
+            <div
+              style={{
+                position: 'fixed',
+                top: `${contextMenu.y}px`,
+                left: `${contextMenu.x}px`,
+                background: 'white',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+                zIndex: 10000,
+                padding: '8px 0',
+                minWidth: '180px',
+                fontSize: '14px'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+          
+          {/* ★★★ 다운로드 버튼 ★★★ */}
+          <div
+            style={{
+              padding: '12px 20px',
+              cursor: 'pointer',
+              borderBottom: '1px solid #eee' // 휴지통 버튼과 구분선
+            }}
+            onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+            onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
+            onClick={() => {
+              if (contextMenu.fileId !== null) {
+                handleDownload(contextMenu.fileId); // 다운로드 함수 실행!
+              }
+              setContextMenu(null); // 클릭 후 메뉴 닫기
+            }}
+          >
+            다운로드
+          </div>
+
+          {/* ★★★ 휴지통 버튼 ★★★ */}
           <div
             style={{
               padding: '12px 20px',
