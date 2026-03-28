@@ -35,6 +35,27 @@ export function FileProvider({ children }) {
     };
 
 
+    // ★ 파일 다중 이동 API 호출 함수
+    const moveFilesToFolder = async (fileIds, targetFolderId) => {
+        if (!user || !token) return;
+        try {
+            await axios.patch('http://localhost:8080/api/files/move', {
+                fileIds: Array.from(fileIds), // Set을 Array로 변환해서 전송
+                targetFolderId: targetFolderId,
+                userId: user.id
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            // 성공하면 화면을 즉시 새로고침하고, 잡고 있던 선택 박스 초기화
+            fetchContents(currentFolderId);
+            setSelectedIds(new Set());
+        } catch (error) {
+            console.error("파일 이동 실패:", error);
+            alert("파일 이동 중 오류가 발생했습니다.");
+        }
+    };
+
 
 
 
@@ -459,6 +480,8 @@ export function FileProvider({ children }) {
             folderHistory,
             enterFolder,
             goToPath,
+            fetchTrash,
+            moveFilesToFolder,
 
         }}>
         {children}

@@ -27,6 +27,7 @@ const UserPage = () => {
           folderHistory,
           enterFolder,
           goToPath,
+          moveFilesToFolder,
         } = useFile();
 
   //const visibleFiles = files.filter(file => !file.trashed); // 아래처럼 undefined 대비 안정장치 추가
@@ -85,33 +86,83 @@ const UserPage = () => {
 //   };
 ///// 다중 선택으로 인해 수정
 ////////////////////////////////////////////////////////
+// 다중 이동으로 인해 수정
+// const handleDrop = (e, dropIndex) => {
+//     e.preventDefault();
+//     if (dragIndex === null) return;
 
-const handleDrop = (e, dropIndex) => {
+//     const draggedFile = visibleFiles[dragIndex];
+//     if (!draggedFile) return;
+
+//     // 1. 드래그한 파일이 '다중 선택 그룹'에 포함되어 있는지 확인!
+//     const isMultiDrag = selectedIds.size > 1 && selectedIds.has(draggedFile.id);
+    
+//     // 2. 이동시킬 대상 ID 목록 결정 (다중 선택이면 전체, 아니면 방금 잡은 거 1개)
+//     const idsToMove = isMultiDrag ? Array.from(selectedIds) : [draggedFile.id];
+
+//     // 3. 이동할 놈들을 뺀 '나머지 파일들'만 걸러내기
+//     const extractedFiles = visibleFiles.filter(f => idsToMove.includes(f.id));
+//     const remainingFiles = visibleFiles.filter(f => !idsToMove.includes(f.id));
+
+//     // 4. 놓은 위치(dropIndex)를 '나머지 파일들' 기준으로 재계산
+//     const targetFile = visibleFiles[dropIndex];
+//     let newDropIndex = remainingFiles.findIndex(f => f.id === targetFile.id);
+//     if (newDropIndex === -1) newDropIndex = remainingFiles.length; // 못 찾으면 맨 끝으로
+
+//     // 5. 계산된 위치에 뽑아뒀던 묶음(extractedFiles)을 통째로 삽입!
+//     remainingFiles.splice(newDropIndex, 0, ...extractedFiles);
+
+//     // 6. 휴지통 파일들과 다시 합쳐서 최종 저장
+//     const newFiles = [
+//       ...files.filter(file => file.trashed),
+//       ...remainingFiles
+//     ];
+
+//     setFiles(newFiles);
+//     setDragIndex(null);
+//   };
+
+//   const handleDragEnd = () => {
+//     setDragIndex(null);
+//   };
+
+  const handleDrop = (e, dropIndex) => {
     e.preventDefault();
     if (dragIndex === null) return;
 
-    const draggedFile = visibleFiles[dragIndex];
-    if (!draggedFile) return;
+    // ★ 1. 드래그한 항목과 내려놓은 위치의 항목을 allItems 기준으로 정확히 찾습니다.
+    const draggedItem = allItems[dragIndex];
+    const targetItem = allItems[dropIndex];
 
-    // 1. 드래그한 파일이 '다중 선택 그룹'에 포함되어 있는지 확인!
-    const isMultiDrag = selectedIds.size > 1 && selectedIds.has(draggedFile.id);
-    
-    // 2. 이동시킬 대상 ID 목록 결정 (다중 선택이면 전체, 아니면 방금 잡은 거 1개)
-    const idsToMove = isMultiDrag ? Array.from(selectedIds) : [draggedFile.id];
+    if (!draggedItem || !targetItem) {
+        setDragIndex(null);
+        return;
+    }
 
-    // 3. 이동할 놈들을 뺀 '나머지 파일들'만 걸러내기
+    // ★ 2. 이동시킬 ID 목록 추출 (다중 선택 대응)
+    const isMultiDrag = selectedIds.size > 1 && selectedIds.has(draggedItem.id);
+    const idsToMove = isMultiDrag ? Array.from(selectedIds) : [draggedItem.id];
+
+    // =================================================================
+    // ★ 3. 목적지가 '폴더'인 경우 -> 서버로 이동 명령 보내기!
+    // =================================================================
+    if (targetItem.type === 'folder') {
+        moveFilesToFolder(idsToMove, targetItem.id);
+        setDragIndex(null);
+        return; // 이동 API를 불렀으므로 여기서 함수 즉시 종료!
+    }
+
+    // =================================================================
+    // ★ 4. 목적지가 폴더가 아닌 경우 (파일 위) -> 기존처럼 순서만 바꾸기
+    // =================================================================
     const extractedFiles = visibleFiles.filter(f => idsToMove.includes(f.id));
     const remainingFiles = visibleFiles.filter(f => !idsToMove.includes(f.id));
 
-    // 4. 놓은 위치(dropIndex)를 '나머지 파일들' 기준으로 재계산
-    const targetFile = visibleFiles[dropIndex];
-    let newDropIndex = remainingFiles.findIndex(f => f.id === targetFile.id);
-    if (newDropIndex === -1) newDropIndex = remainingFiles.length; // 못 찾으면 맨 끝으로
+    let newDropIndex = remainingFiles.findIndex(f => f.id === targetItem.id);
+    if (newDropIndex === -1) newDropIndex = remainingFiles.length; 
 
-    // 5. 계산된 위치에 뽑아뒀던 묶음(extractedFiles)을 통째로 삽입!
     remainingFiles.splice(newDropIndex, 0, ...extractedFiles);
 
-    // 6. 휴지통 파일들과 다시 합쳐서 최종 저장
     const newFiles = [
       ...files.filter(file => file.trashed),
       ...remainingFiles
@@ -121,9 +172,10 @@ const handleDrop = (e, dropIndex) => {
     setDragIndex(null);
   };
 
-  const handleDragEnd = () => {
+    const handleDragEnd = () => {
     setDragIndex(null);
-  };
+    };
+
 
   /////////////////////////////////////////////////////////
   //// 클릭 로직
@@ -302,7 +354,11 @@ const handleDrop = (e, dropIndex) => {
   // ★ 백엔드에서 받아온 폴더와 파일을 하나의 리스트로 합치기
   const allItems = [
     ...(folders || []).map(f => ({ ...f, type: 'folder' })),
-    ...(files || []).filter(f => !f.trashed).map(f => ({ ...f, type: f.type || 'file' }))
+    ...(files || []).filter(f => !f.trashed).map(f => {
+        // ★ 핵심: 백엔드가 type을 안 주더라도, url이 http로 시작하면 무조건 link로 간주!
+        const isLink = f.type === 'link' || (f.url && f.url.startsWith('http'));
+        return { ...f, type: isLink ? 'link' : 'file' };
+    })
   ];
 
   return (
@@ -323,8 +379,6 @@ const handleDrop = (e, dropIndex) => {
       }}
       
     >
-
-    <div className="UserMainSection">
 
       {/* ================= [★ 상단 폴더 경로(Breadcrumb) UI 추가] ================= */}
       <div style={{ 
@@ -355,6 +409,9 @@ const handleDrop = (e, dropIndex) => {
               </span>
           ))}
       </div>
+
+    <div className="UserMainSection">
+
       {/* ========================================================================= */}
 
 
@@ -406,12 +463,13 @@ const handleDrop = (e, dropIndex) => {
               // handleDoubleClick(file); // url이 아니라 file 객체 전체를 넘겨줍니다!
               handleDoubleClick(item);
             }}
-
+ 
             // 우클릭 이벤트
             // onContextMenu={(e) => handleContextMenu(e, file.id)} allItems 로 인한 변경
             onContextMenu={(e) => {
-              if (e.target.closest('.FileBox')) return;
-              handleContextMenu(e, item.id)
+              e.preventDefault();
+              e.stopPropagation();
+              handleContextMenu(e, item.id);
             }}
             
             // 선택됐는지 표시용 data 속성
@@ -430,26 +488,23 @@ const handleDrop = (e, dropIndex) => {
           {/* ================= [수정된 썸네일 영역] ================= */}
           {/* 1. 이미지든 아이콘이든 통일된 상자(.FileThumbnailBox)로 감쌉니다. */}
           <div className="FileThumbnailBox">
-              {item.type === 'file' && item.title.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
-                // Case A: 이미지 파일일 때 -> <img> 태그 사용
-                <img 
+            {item.type === 'folder' ? (
+              <div className='FolderIcon'></div>
+            ) : item.type === 'file' && item.title.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+              <img 
                   src={`http://localhost:8080${item.url}`} 
                   alt={item.title}
-                  // (CSS 파일에서 스타일을 관리하므로 인라인 스타일 제거됨)
                   onError={(e) => { 
-                    // 이미지 로딩 실패 시, 부모 상자에 아이콘 클래스를 줘서 아이콘을 띄움
-                    e.target.style.display = 'none'; // 깨진 이미지 숨김
-                    e.target.parentNode.classList.add('FileIcon'); // 부모에게 아이콘 클래스 추가
+                    e.target.style.display = 'none'; 
+                    e.target.parentNode.classList.add('FileIcon'); 
                   }}
                 />
               ) : (
-                // Case B: 링크거나 이미지가 아닐 때 -> 아이콘 div 사용
-                // 이 div는 CSS에 의해 너비/높이를 가져서 이제 보일 겁니다!
+                // Case C: 링크거나 이미지가 아닐 때 (기존 유지) -> 일반 아이콘 div 사용
                 <div className={item.type === 'link' ? 'LinkIcon' : 'FileIcon'}></div>
               )}
           </div>
-          {/* ========================================================= */}
-
+          
           <p>{item.name || item.title}</p>
         </div>
           </a>

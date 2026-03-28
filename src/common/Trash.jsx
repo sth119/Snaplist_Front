@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
-import { useFile } from '../common/Context';  // Context 경로 맞는지 확인!
-import '../user/UserPage.css';  // 스타일 재사용 (필요하면 따로 만들어도 돼요)
+import { useFile } from '../common/Context';  
+import '../user/UserPage.css';  
 
 const Trash = () => {
   const { 
-    files, 
-    restoreTrash,   // 복구 함수
-    deleteTrash,    // 영구 삭제 함수 (나중에 쓰거나 지금 안 써도 됨)
+    trashFiles,      // ★ files 대신 trashFiles 사용
+    fetchTrash,      // ★ 휴지통 데이터 가져오는 함수
+    restoreTrash,   
+    deleteTrash,    
     selectedIds,
     setSelectedIds,
     handleContextMenu,
@@ -14,11 +15,14 @@ const Trash = () => {
     setContextMenu,
   } = useFile();
 
-  // 휴지통 파일만 필터링
-  const trashedFiles = files.filter(file => file.trashed);
+  // ★ 화면 켜질 때 휴지통 데이터 무조건 새로 받아오기
+  useEffect(() => {
+    fetchTrash();
+  }, []);
 
   const handleClick = (e, fileId) => {
     e.preventDefault();
+    e.stopPropagation(); // 이벤트 새어나감 방지
     if (e.ctrlKey || e.metaKey || e.shiftKey) return;
 
     setSelectedIds(prev => {
@@ -33,16 +37,20 @@ const Trash = () => {
     });
   };
 
-  const handleDoubleClick = (url) => {
-    window.open(url, '_blank', 'noopener,noreferrer');
+  const handleDoubleClick = (file) => {
+    // ★ 메인 화면과 동일하게 로컬호스트 주소 분기 처리
+    const targetUrl = file.type === 'file'
+      ? `http://localhost:8080${file.url}` 
+      : file.url;
+    window.open(targetUrl, '_blank', 'noopener,noreferrer');
   };
 
-  // Del 키로 영구 삭제 (옵션, 나중에 추가해도 돼요)
+  // Del 키로 영구 삭제
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Delete' && selectedIds.size > 0) {
         e.preventDefault();
-        if (confirm('영구 삭제하시겠습니까? 복구 불가합니다.')) {
+        if (confirm('선택한 항목을 영구 삭제하시겠습니까? 복구 불가합니다.')) {
           deleteTrash(selectedIds);
           setSelectedIds(new Set());
         }
@@ -53,34 +61,67 @@ const Trash = () => {
   }, [selectedIds, deleteTrash]);
 
   return (
+    // ★ 메인 화면과 동일한 스타일 유지를 위해 가장 큰 껍데기를 씌워줍니다.
+    <div 
+        className="UserPage" 
+        style={{ userSelect: 'none', minHeight: '100vh', position: 'relative' }}
+        onClick={() => setContextMenu(null)} // 빈 공간 클릭 시 메뉴 닫기
+        onContextMenu={(e) => e.preventDefault()} // 바탕화면 기본 우클릭 메뉴 차단
+    >
     <div className="UserMainSection">
 
-      {trashedFiles.length === 0 ? (
+      {trashFiles.length === 0 ? (
         <p style={{ textAlign: 'center', color: '#999', marginTop: '50px' }}>
           휴지통이 비어 있습니다.
         </p>
       ) : (
-        trashedFiles.map(file => (
+        trashFiles.map(file => (
           <a
             key={file.id}
-            href={file.url}
-            target='_blank'
-            rel='noopener noreferrer'
+            href={file.type !== 'folder' ? file.url : '#'}
+            target={file.type !== 'folder' ? '_blank' : ''}
+            rel={file.type !== 'folder' ? 'noopener noreferrer' : ''}
             className='block'
             onClick={(e) => handleClick(e, file.id)}
-            onDoubleClick={() => handleDoubleClick(file.url)}
-            onContextMenu={(e) => handleContextMenu(e, file.id)}
+            onDoubleClick={(e) => {
+                e.stopPropagation();
+                handleDoubleClick(file);
+            }}
+            onContextMenu={(e) => {
+                e.preventDefault();
+                e.stopPropagation(); // ★ 우클릭 버블링 완벽 차단
+                handleContextMenu(e, file.id);
+            }}
+            data-selected={selectedIds.has(file.id)}
           >
-            <div className={`FileBox ${selectedIds.has(file.id) ? 'selected' : ''}`}>
-              <div className="FileIcon"></div>
-              <p>{file.title}</p>
+            <div className={`FileBox ${selectedIds.has(file.id) ? 'selected' : ''}`} data-id={file.id}>
+              
+              {/* ★ 메인 화면의 예쁜 썸네일 & 아이콘 렌더링 로직 이식 */}
+              <div className="FileThumbnailBox">
+                {file.type === 'folder' ? (
+                  <div className='FolderIcon'></div>
+                ) : file.type === 'file' && file.title.match(/\.(jpeg|jpg|gif|png|webp|bmp)$/i) ? (
+                  <img 
+                      src={`http://localhost:8080${file.url}`} 
+                      alt={file.title}
+                      onError={(e) => { 
+                        e.target.style.display = 'none'; 
+                        e.target.parentNode.classList.add('FileIcon'); 
+                      }}
+                    />
+                  ) : (
+                    <div className={file.type === 'link' ? 'LinkIcon' : 'FileIcon'}></div>
+                  )}
+              </div>
+
+              <p>{file.title || file.name}</p>
             </div>
           </a>
         ))
       )}
 
       {/* 우클릭 메뉴 - 휴지통 버전 (복구 + 영구 삭제) */}
-      {contextMenu && (
+      {contextMenu && contextMenu.fileId !== null && (
         <div
           style={{
             position: 'fixed',
@@ -96,17 +137,23 @@ const Trash = () => {
             fontSize: '14px'
           }}
           onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           {/* 복구 메뉴 */}
           <div
             style={{
               padding: '12px 20px',
               cursor: 'pointer',
+              borderBottom: '1px solid #eee'
             }}
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
             onClick={() => {
-              if (contextMenu.fileId !== null) {
+              // ★ 다중 선택 복구 완벽 연동!
+              if (selectedIds.has(contextMenu.fileId)) {
+                restoreTrash(selectedIds);
+                setSelectedIds(new Set());
+              } else {
                 restoreTrash(new Set([contextMenu.fileId]));
               }
               setContextMenu(null);
@@ -115,7 +162,7 @@ const Trash = () => {
             복구
           </div>
 
-          {/* 영구 삭제 메뉴 (나중에 확인 모달 추가 가능) */}
+          {/* 영구 삭제 메뉴 */}
           <div
             style={{
               padding: '12px 20px',
@@ -125,8 +172,14 @@ const Trash = () => {
             onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fdf2f2'}
             onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'white'}
             onClick={() => {
-              if (contextMenu.fileId !== null && confirm('영구 삭제하시겠습니까?')) {
-                deleteTrash(new Set([contextMenu.fileId]));
+              // ★ 다중 선택 영구 삭제 완벽 연동!
+              if (confirm('선택한 항목을 영구 삭제하시겠습니까?')) {
+                if (selectedIds.has(contextMenu.fileId)) {
+                  deleteTrash(selectedIds);
+                  setSelectedIds(new Set());
+                } else {
+                  deleteTrash(new Set([contextMenu.fileId]));
+                }
               }
               setContextMenu(null);
             }}
@@ -135,6 +188,7 @@ const Trash = () => {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 };
