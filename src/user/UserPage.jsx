@@ -391,12 +391,35 @@ const UserPage = () => {
           alignItems: 'center'
       }}>
           {folderHistory.map((folder, index) => (
-              <span key={index}>
+              <span 
+              key={index}
+              onDragOver={(e) => {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+              }}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragIndex === null) return;
+
+                // 드래그한 대상 찾기
+                      const draggedItem = allItems[dragIndex];
+                      if (!draggedItem) return;
+
+                      // 다중 선택 연동
+                      const isMultiDrag = selectedIds.size > 1 && selectedIds.has(draggedItem.id);
+                      const idsToMove = isMultiDrag ? Array.from(selectedIds) : [draggedItem.id];
+
+                      // ★ 드롭한 경로의 폴더 ID(folder.id)로 이동 API 호출! (홈이면 null이 들어감)
+                      moveFilesToFolder(idsToMove, folder.id);
+                      setDragIndex(null);
+              }}
+              >
                   <span 
                       style={{ 
                           cursor: 'pointer', 
                           color: index === folderHistory.length - 1 ? '#333' : '#2196F3',
-                          textDecoration: index === folderHistory.length - 1 ? 'none' : 'underline'
+                          textDecoration: index === folderHistory.length - 1 ? 'none' : 'underline',
+                          padding: '5px'
                       }}
                       onClick={() => goToPath(index)}
                   >
